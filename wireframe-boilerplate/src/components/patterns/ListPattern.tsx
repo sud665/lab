@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Card, Button, Input, Badge, Table } from '@/components/ui'
+import { Button, Input, Table } from '@/components/ui'
 import type { TableColumn } from '@/components/ui/Table'
 import { Icons } from '@/config'
 
