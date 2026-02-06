@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --no-import-alias --turbopack --yes)",
+      "Bash(npm install:*)",
+      "Bash(npm ls:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx create-next-app:*)",
+      "mcp__vercel__search_vercel_documentation",
+      "Bash(git -C /Users/max/Desktop/lab log --oneline -10)"
+    ]
+  }
+}

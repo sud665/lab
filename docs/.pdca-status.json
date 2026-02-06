@@ -1,0 +1,611 @@
+{
+  "version": "2.0",
+  "lastUpdated": "2026-02-05T07:24:48.629Z",
+  "activeFeatures": [
+    "wireframe-v2",
+    "ai-page-generator",
+    "generate",
+    "ui",
+    "generator",
+    "super-admin",
+    "providers",
+    "layout",
+    "page.tsx",
+    "analytics",
+    "wireframe-boilerplate",
+    "ranking",
+    "settings"
+  ],
+  "primaryFeature": "wireframe-v2",
+  "features": {
+    "wireframe-boilerplate": {
+      "name": "wireframe-boilerplate",
+      "phase": "do",
+      "matchRate": 98,
+      "iterationCount": 0,
+      "createdAt": "2026-02-05T00:00:00.000Z",
+      "updatedAt": "2026-02-05T00:00:00.000Z",
+      "completedAt": "2026-02-05T00:00:00.000Z",
+      "documents": {
+        "plan": "docs/01-plan/features/wireframe-boilerplate.plan.md",
+        "design": "docs/02-design/features/wireframe-boilerplate.design.md",
+        "analysis": "docs/03-analysis/wireframe-boilerplate.analysis.md",
+        "report": "docs/04-report/features/wireframe-boilerplate.report.md"
+      },
+      "phaseNumber": 3,
+      "lastFile": "/Users/max/Desktop/lab/wireframe-boilerplate/src/lib/prompts.ts",
+      "timestamps": {
+        "lastUpdated": "2026-02-05T07:23:56.306Z"
+      }
+    },
+    "wireframe-v2": {
+      "name": "wireframe-v2",
+      "phase": "check",
+      "matchRate": 100,
+      "iterationCount": 0,
+      "createdAt": "2026-02-05T00:00:00.000Z",
+      "updatedAt": "2026-02-05T01:00:00.000Z",
+      "documents": {
+        "plan": "docs/01-plan/features/wireframe-v2.plan.md",
+        "design": "docs/02-design/features/wireframe-v2.design.md",
+        "analysis": "docs/03-analysis/wireframe-v2.analysis.md"
+      }
+    },
+    "ai-page-generator": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-05T04:17:06.004Z",
+        "lastUpdated": "2026-02-05T05:31:53.032Z"
+      },
+      "lastFile": "/Users/max/Desktop/lab/ai-page-generator/src/app/page.tsx"
+    },
+    "generate": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-05T04:17:35.717Z",
+        "lastUpdated": "2026-02-05T07:24:12.592Z"
+      },
+      "lastFile": "/Users/max/Desktop/lab/wireframe-boilerplate/src/app/api/generate/route.ts"
+    },
+    "ui": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-05T04:17:44.591Z",
+        "lastUpdated": "2026-02-05T07:24:41.045Z"
+      },
+      "lastFile": "/Users/max/Desktop/lab/super-admin/components/ui/Chart.tsx"
+    },
+    "generator": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-05T04:17:59.043Z",
+        "lastUpdated": "2026-02-05T07:24:48.629Z"
+      },
+      "lastFile": "/Users/max/Desktop/lab/wireframe-boilerplate/src/app/generator/page.tsx"
+    },
+    "super-admin": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-05T07:18:39.807Z",
+        "lastUpdated": "2026-02-05T07:21:49.028Z"
+      },
+      "lastFile": "/Users/max/Desktop/lab/super-admin/app/page.tsx"
+    },
+    "providers": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-05T07:18:52.713Z",
+        "lastUpdated": "2026-02-05T07:18:53.239Z"
+      },
+      "lastFile": "/Users/max/Desktop/lab/super-admin/components/providers/index.ts"
+    },
+    "layout": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-05T07:20:26.651Z",
+        "lastUpdated": "2026-02-05T07:20:31.953Z"
+      },
+      "lastFile": "/Users/max/Desktop/lab/super-admin/components/layout/index.ts"
+    },
+    "page.tsx": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-05T07:22:24.537Z",
+        "lastUpdated": "2026-02-05T07:22:24.537Z"
+      },
+      "lastFile": "/Users/max/Desktop/lab/super-admin/app/services/page.tsx"
+    },
+    "analytics": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-05T07:22:51.417Z",
+        "lastUpdated": "2026-02-05T07:22:51.417Z"
+      },
+      "lastFile": "/Users/max/Desktop/lab/super-admin/app/analytics/page.tsx"
+    },
+    "ranking": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-05T07:23:21.475Z",
+        "lastUpdated": "2026-02-05T07:23:21.475Z"
+      },
+      "lastFile": "/Users/max/Desktop/lab/super-admin/app/ranking/page.tsx"
+    },
+    "settings": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-05T07:24:18.937Z",
+        "lastUpdated": "2026-02-05T07:24:18.937Z"
+      },
+      "lastFile": "/Users/max/Desktop/lab/super-admin/app/settings/page.tsx"
+    }
+  },
+  "pipeline": {
+    "currentPhase": 3,
+    "level": "Starter",
+    "phaseHistory": []
+  },
+  "session": {
+    "startedAt": "2026-02-05T00:00:00.000Z",
+    "onboardingCompleted": true,
+    "lastActivity": "2026-02-05T07:24:48.629Z"
+  },
+  "history": [
+    {
+      "action": "plan",
+      "feature": "wireframe-boilerplate",
+      "timestamp": "2026-02-05T00:00:00.000Z"
+    },
+    {
+      "action": "design",
+      "feature": "wireframe-boilerplate",
+      "timestamp": "2026-02-05T00:00:00.000Z"
+    },
+    {
+      "action": "do",
+      "feature": "wireframe-boilerplate",
+      "timestamp": "2026-02-05T00:00:00.000Z"
+    },
+    {
+      "action": "check",
+      "feature": "wireframe-boilerplate",
+      "timestamp": "2026-02-05T00:00:00.000Z",
+      "matchRate": 98
+    },
+    {
+      "action": "report",
+      "feature": "wireframe-boilerplate",
+      "timestamp": "2026-02-05T00:00:00.000Z"
+    },
+    {
+      "action": "plan",
+      "feature": "wireframe-v2",
+      "timestamp": "2026-02-05T00:00:00.000Z"
+    },
+    {
+      "action": "design",
+      "feature": "wireframe-v2",
+      "timestamp": "2026-02-05T00:00:00.000Z"
+    },
+    {
+      "action": "do",
+      "feature": "wireframe-v2",
+      "timestamp": "2026-02-05T00:55:00.000Z"
+    },
+    {
+      "action": "check",
+      "feature": "wireframe-v2",
+      "timestamp": "2026-02-05T01:00:00.000Z",
+      "matchRate": 100
+    },
+    {
+      "timestamp": "2026-02-05T04:17:06.004Z",
+      "feature": "ai-page-generator",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T04:17:14.669Z",
+      "feature": "ai-page-generator",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T04:17:23.207Z",
+      "feature": "ai-page-generator",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T04:17:35.717Z",
+      "feature": "generate",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T04:17:44.591Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T04:17:47.523Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T04:17:48.119Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T04:17:59.043Z",
+      "feature": "generator",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T04:18:04.761Z",
+      "feature": "generator",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T04:18:15.809Z",
+      "feature": "generator",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T04:18:16.385Z",
+      "feature": "generator",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T04:19:08.016Z",
+      "feature": "ai-page-generator",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T04:19:10.400Z",
+      "feature": "ai-page-generator",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T05:18:38.141Z",
+      "feature": "generator",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T05:19:02.971Z",
+      "feature": "generate",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T05:23:17.693Z",
+      "feature": "ai-page-generator",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T05:23:31.790Z",
+      "feature": "ai-page-generator",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T05:23:44.119Z",
+      "feature": "ai-page-generator",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T05:23:50.467Z",
+      "feature": "ai-page-generator",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T05:24:47.036Z",
+      "feature": "ai-page-generator",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T05:30:05.225Z",
+      "feature": "generator",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T05:30:22.683Z",
+      "feature": "generator",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T05:30:51.007Z",
+      "feature": "generator",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T05:31:16.228Z",
+      "feature": "generator",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T05:31:21.100Z",
+      "feature": "generator",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T05:31:53.032Z",
+      "feature": "ai-page-generator",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T05:32:06.496Z",
+      "feature": "generator",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:18:39.807Z",
+      "feature": "super-admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:18:42.763Z",
+      "feature": "super-admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:18:52.713Z",
+      "feature": "providers",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:18:53.240Z",
+      "feature": "providers",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:19:02.023Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:19:07.399Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:19:11.979Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:19:15.477Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:19:25.179Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:19:36.465Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:19:50.071Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:19:55.409Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:20:04.463Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:20:06.080Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:20:26.651Z",
+      "feature": "layout",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:20:31.335Z",
+      "feature": "layout",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:20:31.953Z",
+      "feature": "layout",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:20:47.020Z",
+      "feature": "super-admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:20:47.872Z",
+      "feature": "super-admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:21:13.704Z",
+      "feature": "super-admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:21:49.028Z",
+      "feature": "super-admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:22:24.537Z",
+      "feature": "page.tsx",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:22:51.417Z",
+      "feature": "analytics",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:23:11.240Z",
+      "feature": "wireframe-boilerplate",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:23:21.475Z",
+      "feature": "ranking",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:23:23.601Z",
+      "feature": "wireframe-boilerplate",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:23:40.455Z",
+      "feature": "wireframe-boilerplate",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:23:56.306Z",
+      "feature": "wireframe-boilerplate",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:24:12.592Z",
+      "feature": "generate",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:24:18.937Z",
+      "feature": "settings",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:24:41.045Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-05T07:24:48.629Z",
+      "feature": "generator",
+      "phase": "do",
+      "action": "updated"
+    }
+  ]
+}
