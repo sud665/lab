@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { TopBar } from './TopBar';
+import './top-bar.css';
 import '../styles/global.css';
 
 // Create a container for the top bar
@@ -34,6 +35,16 @@ document.addEventListener('paste', async (event) => {
         payload: { text: pastedText },
       });
     }
+  }
+});
+
+// Listen for distraction warnings from background service worker
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.type === 'SHOW_DISTRACTION_WARNING') {
+    const { siteName } = message.payload;
+    window.dispatchEvent(
+      new CustomEvent('focus-guard-distraction', { detail: { siteName } })
+    );
   }
 });
 

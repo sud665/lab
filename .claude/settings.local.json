@@ -8,7 +8,12 @@
       "Bash(npm run build:*)",
       "Bash(npx create-next-app:*)",
       "mcp__vercel__search_vercel_documentation",
-      "Bash(git -C /Users/max/Desktop/lab log --oneline -10)"
+      "Bash(git -C /Users/max/Desktop/lab log --oneline -10)",
+      "Bash(npx tsc:*)",
+      "Bash(python3:*)",
+      "Bash(npm test:*)",
+      "mcp__plugin_context7_context7__resolve-library-id",
+      "mcp__plugin_context7_context7__query-docs"
     ]
   }
 }

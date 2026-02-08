@@ -52,6 +52,7 @@ export interface RewardStatus {
 export interface StorageData {
   settings: UserSettings;
   currentSession: CurrentSession;
-  dailyStats: Record<string, DailyStats>;
+  tasks: Task[];
+  dailyStatsMap: Record<string, DailyStats>;
   rewardStatus: RewardStatus;
 }

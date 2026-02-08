@@ -1,11 +1,12 @@
 import { create } from 'zustand';
 import type { CurrentSession, Task, UserSettings, DailyStats, RewardStatus } from '../types';
+import { calculateMoney, getTodayDateString } from '../utils/time';
 
 interface AppState {
   settings: UserSettings;
   currentSession: CurrentSession;
   tasks: Task[];
-  dailyStats: DailyStats | null;
+  dailyStatsMap: Record<string, DailyStats>;
   rewardStatus: RewardStatus;
 
   // Actions
@@ -18,6 +19,12 @@ interface AppState {
   deleteTask: (taskId: string) => void;
   loadFromStorage: () => Promise<void>;
   saveToStorage: () => Promise<void>;
+
+  // Phase 2 Actions
+  getDailyStats: () => DailyStats;
+  updateDailyStats: () => void;
+  recordDistractTime: (seconds: number) => void;
+  checkAndGrantReward: () => void;
 }
 
 const DEFAULT_SETTINGS: UserSettings = {
@@ -46,7 +53,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     accumulatedTime: 0,
   },
   tasks: [],
-  dailyStats: null,
+  dailyStatsMap: {},
   rewardStatus: {
     unlimitedUntil: null,
     bonusMinutes: 0,
@@ -90,6 +97,7 @@ export const useAppStore = create<AppState>((set, get) => ({
           accumulatedTime: currentSession.accumulatedTime + elapsed,
         },
       });
+      get().updateDailyStats();
       get().saveToStorage();
     }
   },
@@ -100,6 +108,8 @@ export const useAppStore = create<AppState>((set, get) => ({
         task.id === taskId ? { ...task, isCompleted: true, completedAt: Date.now() } : task
       ),
     }));
+    get().updateDailyStats();
+    get().checkAndGrantReward();
     get().saveToStorage();
   },
 
@@ -132,14 +142,112 @@ export const useAppStore = create<AppState>((set, get) => ({
     get().saveToStorage();
   },
 
+  // Phase 2: DailyStats
+
+  getDailyStats: () => {
+    const today = getTodayDateString();
+    const { dailyStatsMap, tasks, settings } = get();
+    const stats = dailyStatsMap[today];
+    if (stats) return stats;
+    const totalFocusTime = tasks.reduce((sum, t) => sum + t.totalTime, 0);
+    const completedTasks = tasks.filter((t) => t.isCompleted).length;
+    return {
+      date: today,
+      totalFocusTime,
+      totalDistractTime: 0,
+      earnedMoney: calculateMoney(totalFocusTime, settings.hourlyRate),
+      lostMoney: 0,
+      completedTasks,
+      tasks: [...tasks],
+    };
+  },
+
+  updateDailyStats: () => {
+    const today = getTodayDateString();
+    const { tasks, settings, dailyStatsMap } = get();
+    const existing = dailyStatsMap[today];
+    const totalFocusTime = tasks.reduce((sum, t) => sum + t.totalTime, 0);
+    const completedTasks = tasks.filter((t) => t.isCompleted).length;
+    set({
+      dailyStatsMap: {
+        ...dailyStatsMap,
+        [today]: {
+          date: today,
+          totalFocusTime,
+          totalDistractTime: existing?.totalDistractTime ?? 0,
+          earnedMoney: calculateMoney(totalFocusTime, settings.hourlyRate),
+          lostMoney: existing?.lostMoney ?? 0,
+          completedTasks,
+          tasks: [...tasks],
+        },
+      },
+    });
+    get().saveToStorage();
+  },
+
+  recordDistractTime: (seconds) => {
+    const today = getTodayDateString();
+    const { dailyStatsMap, settings } = get();
+    const existing = dailyStatsMap[today] || get().getDailyStats();
+    set({
+      dailyStatsMap: {
+        ...dailyStatsMap,
+        [today]: {
+          ...existing,
+          totalDistractTime: existing.totalDistractTime + seconds,
+          lostMoney: existing.lostMoney + calculateMoney(seconds, settings.hourlyRate),
+        },
+      },
+    });
+    get().saveToStorage();
+  },
+
+  // Phase 2: Reward System
+
+  checkAndGrantReward: () => {
+    const { settings, rewardStatus, dailyStatsMap } = get();
+    const today = getTodayDateString();
+    const stats = dailyStatsMap[today];
+
+    if (!stats) return;
+
+    const goalHoursMet = stats.totalFocusTime >= settings.dailyGoal.hours * 3600;
+    const goalTasksMet = stats.completedTasks >= settings.dailyGoal.tasks;
+
+    if (goalHoursMet || goalTasksMet) {
+      const now = new Date();
+      const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).getTime();
+      set({
+        rewardStatus: {
+          ...rewardStatus,
+          unlimitedUntil: Math.max(rewardStatus.unlimitedUntil ?? 0, endOfDay),
+        },
+      });
+    }
+
+    const extraTasks = Math.max(0, stats.completedTasks - settings.dailyGoal.tasks);
+    if (extraTasks > 0) {
+      set({
+        rewardStatus: {
+          ...get().rewardStatus,
+          bonusMinutes: extraTasks * 60,
+        },
+      });
+    }
+
+    get().saveToStorage();
+  },
+
+  // Storage
+
   loadFromStorage: async () => {
     try {
-      const data = await chrome.storage.sync.get(['settings', 'currentSession', 'tasks', 'dailyStats', 'rewardStatus']);
+      const data = await chrome.storage.sync.get(['settings', 'currentSession', 'tasks', 'dailyStatsMap', 'rewardStatus']);
       set({
         settings: (data.settings as UserSettings) || DEFAULT_SETTINGS,
         currentSession: (data.currentSession as CurrentSession) || get().currentSession,
         tasks: (data.tasks as Task[]) || [],
-        dailyStats: (data.dailyStats as DailyStats) || null,
+        dailyStatsMap: (data.dailyStatsMap as Record<string, DailyStats>) || {},
         rewardStatus: (data.rewardStatus as RewardStatus) || get().rewardStatus,
       });
     } catch (error) {
@@ -149,12 +257,12 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   saveToStorage: async () => {
     try {
-      const { settings, currentSession, tasks, dailyStats, rewardStatus } = get();
+      const { settings, currentSession, tasks, dailyStatsMap, rewardStatus } = get();
       await chrome.storage.sync.set({
         settings,
         currentSession,
         tasks,
-        dailyStats,
+        dailyStatsMap,
         rewardStatus,
       });
     } catch (error) {

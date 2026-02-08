@@ -4,7 +4,7 @@ import { useAppStore } from '../shared/store';
 import { formatTime, formatMoney, calculateMoney } from '../shared/utils/time';
 
 export function Popup() {
-  const { settings, currentSession, tasks, loadFromStorage, stopTask, setSettings } = useAppStore();
+  const { settings, currentSession, tasks, rewardStatus, loadFromStorage, stopTask, setSettings, getDailyStats } = useAppStore();
 
   useEffect(() => {
     loadFromStorage();
@@ -13,6 +13,8 @@ export function Popup() {
   const currentTask = tasks.find((t) => t.id === currentSession.taskId);
   const totalFocusTime = tasks.reduce((sum, task) => sum + task.totalTime, 0);
   const earnedMoney = calculateMoney(totalFocusTime, settings.hourlyRate);
+  const todayStats = getDailyStats();
+  const isRewardActive = rewardStatus.unlimitedUntil !== null && Date.now() < rewardStatus.unlimitedUntil;
 
   return (
     <div className="w-80 bg-slate-900 text-white">
@@ -21,6 +23,13 @@ export function Popup() {
       </div>
 
       <div className="p-4 space-y-4">
+        {/* Reward Banner */}
+        {isRewardActive && (
+          <div className="bg-green-900/50 rounded-lg p-3 text-center">
+            <span className="text-green-400 text-sm font-semibold">일일 목표 달성! 자유시간 활성화</span>
+          </div>
+        )}
+
         {/* Current Task */}
         {currentTask ? (
           <div className="bg-slate-800 rounded-lg p-4">
@@ -54,6 +63,10 @@ export function Popup() {
             <div className="flex justify-between">
               <span>획득 금액</span>
               <span className="font-mono text-green-400">{formatMoney(earnedMoney)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>손실 금액</span>
+              <span className="font-mono text-red-400">{formatMoney(todayStats.lostMoney)}</span>
             </div>
             <div className="flex justify-between">
               <span>완료 작업</span>

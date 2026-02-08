@@ -1,6 +1,6 @@
 // Background service worker for Focus Guard
 
-import type { UserSettings } from '../shared/types';
+import type { UserSettings, RewardStatus } from '../shared/types';
 
 // Listen for messages from content scripts
 chrome.runtime.onMessage.addListener((message) => {
@@ -24,9 +24,19 @@ chrome.runtime.onMessage.addListener((message) => {
 // Listen for tab updates to detect distracting sites
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (changeInfo.status === 'complete' && tab.url) {
-    // Check if the URL matches any distracting sites
-    const result = await chrome.storage.sync.get('settings');
+    // Check reward status first
+    const result = await chrome.storage.sync.get(['settings', 'rewardStatus']);
     const settings = result.settings as UserSettings | undefined;
+    const rewardStatus = result.rewardStatus as RewardStatus | undefined;
+
+    // 보상으로 무제한 자유시간인 경우 통과
+    if (rewardStatus?.unlimitedUntil && Date.now() < rewardStatus.unlimitedUntil) {
+      return;
+    }
+    // 보너스 시간이 남아있는 경우 통과
+    if (rewardStatus?.bonusMinutes && rewardStatus.bonusMinutes > 0) {
+      return;
+    }
 
     if (settings?.distractingSites) {
       const isDistracting = settings.distractingSites.some((site) =>

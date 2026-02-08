@@ -1,10 +1,30 @@
 import { useEffect, useState } from 'react';
-import { TrendingUp, Plus, Check, Trash2 } from 'lucide-react';
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Checkbox,
+  Grid,
+  IconButton,
+  LinearProgress,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Paper,
+  TextField,
+  Typography,
+} from '@mui/material';
+import { TrendingUp, TrendingDown, Plus, Trash2 } from 'lucide-react';
 import { useAppStore } from '../shared/store';
 import { formatTime, formatMoney, calculateMoney, getCurrentTime } from '../shared/utils/time';
+import { StatsChart } from '../shared/components/StatsChart';
 
 export function Dashboard() {
-  const { settings, tasks, currentSession, addTask, deleteTask, completeTask, startTask, loadFromStorage } = useAppStore();
+  const { settings, tasks, currentSession, rewardStatus, dailyStatsMap, addTask, deleteTask, completeTask, startTask, loadFromStorage, getDailyStats } = useAppStore();
   const [currentTime, setCurrentTime] = useState(getCurrentTime());
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskMinTime, setNewTaskMinTime] = useState(30);
@@ -19,6 +39,9 @@ export function Dashboard() {
     }, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  const todayStats = getDailyStats();
+  const isRewardActive = rewardStatus.unlimitedUntil !== null && Date.now() < rewardStatus.unlimitedUntil;
 
   const totalFocusTime = tasks.reduce((sum, task) => sum + task.totalTime, 0);
   const earnedMoney = calculateMoney(totalFocusTime, settings.hourlyRate);
@@ -38,157 +61,247 @@ export function Dashboard() {
   const currentTask = tasks.find((t) => t.id === currentSession.taskId);
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white p-8">
+    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', color: 'text.primary', p: 4 }}>
       {/* Header */}
-      <div className="text-center mb-12">
-        <div className="text-6xl font-bold mb-4 font-mono">{currentTime}</div>
-        <div className="text-2xl text-yellow-500 font-semibold">⏰ 시간은 금이다 💰</div>
-      </div>
+      <Box sx={{ textAlign: 'center', mb: 6 }}>
+        <Typography variant="h1" sx={{ fontSize: '3.75rem', fontWeight: 700, mb: 2, fontFamily: 'monospace' }}>
+          {currentTime}
+        </Typography>
+        <Typography variant="h5" sx={{ color: 'primary.main', fontWeight: 600 }}>
+          ⏰ 시간은 금이다 💰
+        </Typography>
+      </Box>
+
+      {/* Reward Banner */}
+      {isRewardActive && (
+        <Box sx={{ maxWidth: '72rem', mx: 'auto', mb: 2 }}>
+          <Alert severity="success" variant="filled" sx={{ justifyContent: 'center', fontWeight: 600 }}>
+            일일 목표 달성! 자유시간 활성화
+          </Alert>
+        </Box>
+      )}
 
       {/* Current Task */}
-      <div className="max-w-6xl mx-auto mb-8">
-        <div className="bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg p-6">
-          {currentTask ? (
-            <div>
-              <div className="text-sm opacity-80 mb-2">현재 작업 중</div>
-              <div className="text-3xl font-bold mb-4">{currentTask.title}</div>
-              <div className="flex items-center gap-4">
-                <div className="font-mono text-2xl">{formatTime(currentTask.totalTime)}</div>
-                <div className="flex-1 bg-white/20 rounded-full h-3 overflow-hidden">
-                  <div
-                    className="bg-white h-full transition-all"
-                    style={{
-                      width: `${Math.min((currentTask.totalTime / (currentTask.minTime * 60)) * 100, 100)}%`,
-                    }}
-                  />
-                </div>
-                <div className="font-mono text-xl">{formatMoney(calculateMoney(currentTask.totalTime, settings.hourlyRate))}</div>
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-4">
-              <div className="text-xl">작업을 선택해서 시작하세요</div>
-            </div>
-          )}
-        </div>
-      </div>
+      <Box sx={{ maxWidth: '72rem', mx: 'auto', mb: 4 }}>
+        <Card sx={{ background: 'linear-gradient(to right, #EAB308, #F97316)', borderRadius: 2 }}>
+          <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
+            {currentTask ? (
+              <Box>
+                <Typography variant="body2" sx={{ opacity: 0.8, mb: 1, color: '#000' }}>
+                  현재 작업 중
+                </Typography>
+                <Typography variant="h4" sx={{ fontWeight: 700, mb: 2, color: '#000' }}>
+                  {currentTask.title}
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <Typography sx={{ fontFamily: 'monospace', fontSize: '1.5rem', color: '#000' }}>
+                    {formatTime(currentTask.totalTime)}
+                  </Typography>
+                  <Box sx={{ flex: 1 }}>
+                    <LinearProgress
+                      variant="determinate"
+                      value={Math.min((currentTask.totalTime / (currentTask.minTime * 60)) * 100, 100)}
+                      sx={{
+                        height: 12,
+                        borderRadius: 6,
+                        bgcolor: 'rgba(255,255,255,0.2)',
+                        '& .MuiLinearProgress-bar': { bgcolor: '#fff', borderRadius: 6 },
+                      }}
+                    />
+                  </Box>
+                  <Typography sx={{ fontFamily: 'monospace', fontSize: '1.25rem', color: '#000' }}>
+                    {formatMoney(calculateMoney(currentTask.totalTime, settings.hourlyRate))}
+                  </Typography>
+                </Box>
+              </Box>
+            ) : (
+              <Box sx={{ textAlign: 'center', py: 2 }}>
+                <Typography variant="h6" sx={{ color: '#000' }}>
+                  작업을 선택해서 시작하세요
+                </Typography>
+              </Box>
+            )}
+          </CardContent>
+        </Card>
+      </Box>
 
-      <div className="max-w-6xl mx-auto grid grid-cols-2 gap-8">
+      <Grid container spacing={4} sx={{ maxWidth: '72rem', mx: 'auto' }}>
         {/* Left: Todo List */}
-        <div>
-          <h2 className="text-2xl font-bold mb-4">📝 오늘 할 일</h2>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>
+            📝 오늘 할 일
+          </Typography>
 
           {/* Add Task Form */}
-          <div className="bg-slate-800 rounded-lg p-4 mb-4">
-            <input
-              type="text"
+          <Paper elevation={2} sx={{ p: 2, mb: 2 }}>
+            <TextField
+              fullWidth
+              size="small"
               placeholder="작업 이름..."
               value={newTaskTitle}
               onChange={(e) => setNewTaskTitle(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleAddTask()}
-              className="w-full bg-slate-700 rounded px-3 py-2 mb-2 outline-none"
+              onKeyDown={(e) => e.key === 'Enter' && handleAddTask()}
+              sx={{ mb: 1 }}
             />
-            <div className="flex items-center gap-2">
-              <input
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <TextField
                 type="number"
+                size="small"
                 value={newTaskMinTime}
                 onChange={(e) => setNewTaskMinTime(Number(e.target.value))}
-                min={5}
-                step={5}
-                className="w-20 bg-slate-700 rounded px-3 py-2 outline-none"
+                slotProps={{ htmlInput: { min: 5, step: 5 } }}
+                sx={{ width: 80 }}
               />
-              <span className="text-sm text-slate-400">분</span>
-              <button
+              <Typography variant="body2" color="text.secondary">분</Typography>
+              <Button
+                variant="contained"
                 onClick={handleAddTask}
-                className="ml-auto bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-semibold px-4 py-2 rounded flex items-center gap-2"
+                startIcon={<Plus size={16} />}
+                sx={{ ml: 'auto' }}
               >
-                <Plus size={16} />
                 추가
-              </button>
-            </div>
-          </div>
+              </Button>
+            </Box>
+          </Paper>
 
           {/* Task List */}
-          <div className="space-y-2">
+          <List disablePadding sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
             {tasks.map((task) => (
-              <div
+              <Paper
                 key={task.id}
-                className={`bg-slate-800 rounded-lg p-4 ${
-                  task.isCompleted ? 'opacity-50' : ''
-                } ${currentSession.taskId === task.id ? 'ring-2 ring-yellow-500' : ''}`}
+                elevation={2}
+                sx={{
+                  opacity: task.isCompleted ? 0.5 : 1,
+                  outline: currentSession.taskId === task.id ? '2px solid' : 'none',
+                  outlineColor: 'primary.main',
+                  borderRadius: 2,
+                  transition: 'transform 0.15s, box-shadow 0.15s',
+                  '&:hover': { transform: 'translateY(-1px)', boxShadow: 4 },
+                }}
               >
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => completeTask(task.id)}
-                    className={`w-6 h-6 rounded border-2 flex items-center justify-center ${
-                      task.isCompleted ? 'bg-green-500 border-green-500' : 'border-slate-600'
-                    }`}
-                  >
-                    {task.isCompleted && <Check size={16} />}
-                  </button>
-                  <div className="flex-1">
-                    <div className={`font-semibold ${task.isCompleted ? 'line-through' : ''}`}>
-                      {task.title}
-                    </div>
-                    <div className="text-sm text-slate-400">
-                      {formatTime(task.totalTime)} / {task.minTime}분
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => startTask(task.id)}
-                    disabled={task.isCompleted || currentSession.isActive}
-                    className="bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-semibold px-3 py-1 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    시작
-                  </button>
-                  <button
-                    onClick={() => deleteTask(task.id)}
-                    className="text-red-400 hover:text-red-300"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              </div>
+                <ListItem
+                  disablePadding
+                  secondaryAction={
+                    <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={() => startTask(task.id)}
+                        disabled={task.isCompleted || currentSession.isActive}
+                      >
+                        시작
+                      </Button>
+                      <IconButton edge="end" size="small" onClick={() => deleteTask(task.id)} sx={{ color: 'error.main' }}>
+                        <Trash2 size={16} />
+                      </IconButton>
+                    </Box>
+                  }
+                >
+                  <ListItemButton dense disableRipple sx={{ cursor: 'default' }}>
+                    <ListItemIcon sx={{ minWidth: 36 }}>
+                      <Checkbox
+                        edge="start"
+                        checked={task.isCompleted}
+                        onChange={() => completeTask(task.id)}
+                        sx={{ color: 'text.secondary', '&.Mui-checked': { color: 'success.main' } }}
+                      />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <Typography sx={{ fontWeight: 600, textDecoration: task.isCompleted ? 'line-through' : 'none' }}>
+                          {task.title}
+                        </Typography>
+                      }
+                      secondary={`${formatTime(task.totalTime)} / ${task.minTime}분`}
+                    />
+                  </ListItemButton>
+                </ListItem>
+              </Paper>
             ))}
-          </div>
-        </div>
+          </List>
+        </Grid>
 
         {/* Right: Stats */}
-        <div>
-          <h2 className="text-2xl font-bold mb-4">📊 오늘 통계</h2>
-          <div className="space-y-4">
-            <div className="bg-slate-800 rounded-lg p-6">
-              <div className="text-sm text-slate-400 mb-2">총 집중 시간</div>
-              <div className="text-3xl font-bold font-mono">{formatTime(totalFocusTime)}</div>
-            </div>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>
+            📊 오늘 통계
+          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Paper elevation={2} sx={{ p: 3, transition: 'box-shadow 0.2s', '&:hover': { boxShadow: 6 } }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>총 집중 시간</Typography>
+              <Typography variant="h4" sx={{ fontWeight: 700, fontFamily: 'monospace' }}>
+                {formatTime(totalFocusTime)}
+              </Typography>
+            </Paper>
 
-            <div className="bg-green-900/50 rounded-lg p-6">
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingUp size={20} className="text-green-400" />
-                <div className="text-sm text-green-400">획득 금액</div>
-              </div>
-              <div className="text-3xl font-bold font-mono text-green-400">{formatMoney(earnedMoney)}</div>
-            </div>
+            <Paper
+              elevation={2}
+              sx={{
+                p: 3,
+                bgcolor: 'rgba(16, 185, 129, 0.1)',
+                transition: 'box-shadow 0.2s',
+                '&:hover': { boxShadow: 6 },
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                <TrendingUp size={20} color="#4ade80" />
+                <Typography variant="body2" sx={{ color: '#4ade80' }}>획득 금액</Typography>
+              </Box>
+              <Typography variant="h4" sx={{ fontWeight: 700, fontFamily: 'monospace', color: '#4ade80' }}>
+                {formatMoney(earnedMoney)}
+              </Typography>
+            </Paper>
 
-            <div className="bg-slate-800 rounded-lg p-6">
-              <div className="text-sm text-slate-400 mb-2">완료한 작업</div>
-              <div className="text-3xl font-bold">
+            <Paper
+              elevation={2}
+              sx={{
+                p: 3,
+                bgcolor: 'rgba(239, 68, 68, 0.1)',
+                transition: 'box-shadow 0.2s',
+                '&:hover': { boxShadow: 6 },
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                <TrendingDown size={20} color="#f87171" />
+                <Typography variant="body2" sx={{ color: '#f87171' }}>손실 금액</Typography>
+              </Box>
+              <Typography variant="h4" sx={{ fontWeight: 700, fontFamily: 'monospace', color: '#f87171' }}>
+                {formatMoney(todayStats.lostMoney)}
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'rgba(248, 113, 113, 0.6)', mt: 0.5 }}>
+                산만 시간: {formatTime(todayStats.totalDistractTime)}
+              </Typography>
+            </Paper>
+
+            <Paper elevation={2} sx={{ p: 3, transition: 'box-shadow 0.2s', '&:hover': { boxShadow: 6 } }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>완료한 작업</Typography>
+              <Typography variant="h4" sx={{ fontWeight: 700 }}>
                 {completedCount} / {tasks.length}
-              </div>
-            </div>
+              </Typography>
+            </Paper>
 
-            <div className="bg-slate-800 rounded-lg p-6">
-              <div className="text-sm text-slate-400 mb-2">일일 목표</div>
-              <div className="text-xl">
+            <Paper elevation={2} sx={{ p: 3, transition: 'box-shadow 0.2s', '&:hover': { boxShadow: 6 } }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>일일 목표</Typography>
+              <Typography variant="h6">
                 {settings.dailyGoal.hours}시간 / {settings.dailyGoal.tasks}개 작업
-              </div>
-              <div className="mt-2 text-sm text-slate-400">
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
                 시급: {formatMoney(settings.hourlyRate)}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+              </Typography>
+            </Paper>
+          </Box>
+        </Grid>
+      </Grid>
+
+      {/* Weekly Stats Chart */}
+      <Box sx={{ maxWidth: '72rem', mx: 'auto', mt: 4 }}>
+        <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>
+          📈 주간 통계
+        </Typography>
+        <Paper elevation={2} sx={{ p: 3 }}>
+          <StatsChart dailyStatsMap={dailyStatsMap} />
+        </Paper>
+      </Box>
+    </Box>
   );
 }
