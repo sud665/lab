@@ -10,13 +10,9 @@ chrome.runtime.onMessage.addListener((message) => {
     // Show notification to suggest starting a task
     chrome.notifications.create({
       type: 'basic',
-      iconUrl: '../public/icons/icon-48.png',
+      iconUrl: chrome.runtime.getURL('public/icons/icon-48.png'),
       title: 'Focus Guard',
-      message: `"${text}" 작업을 시작할까요?`,
-      buttons: [
-        { title: '시작' },
-        { title: '무시' },
-      ],
+      message: `"${text}" — 새 탭에서 작업으로 추가해보세요`,
     });
   }
 });

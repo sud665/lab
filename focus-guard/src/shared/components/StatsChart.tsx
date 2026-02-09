@@ -1,5 +1,4 @@
-import { Typography } from '@mui/material';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import type { DailyStats } from '../types';
 
 interface StatsChartProps {
@@ -7,7 +6,6 @@ interface StatsChartProps {
 }
 
 export function StatsChart({ dailyStatsMap }: StatsChartProps) {
-  // 최근 7일 데이터 생성
   const data = Array.from({ length: 7 }, (_, i) => {
     const date = new Date();
     date.setDate(date.getDate() - (6 - i));
@@ -23,38 +21,57 @@ export function StatsChart({ dailyStatsMap }: StatsChartProps) {
     };
   });
 
+  const tooltipStyle = {
+    backgroundColor: '#1e1e24',
+    border: '1px solid #2a2a32',
+    borderRadius: '10px',
+    boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+    padding: '8px 12px',
+    fontSize: '11px',
+  };
+
+  const axis = {
+    stroke: '#2a2a32',
+    fontSize: 10,
+    fontFamily: "'JetBrains Mono', monospace",
+    fill: '#5c5c66',
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div>
-        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1.5 }}>시간 (분)</Typography>
-        <ResponsiveContainer width="100%" height={200}>
-          <BarChart data={data}>
-            <XAxis dataKey="name" stroke="#94A3B8" fontSize={12} />
-            <YAxis stroke="#94A3B8" fontSize={12} />
-            <Tooltip
-              contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px' }}
-              labelStyle={{ color: '#ffffff' }}
-            />
-            <Legend />
-            <Bar dataKey="집중" fill="#FFD700" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="산만" fill="#EF4444" radius={[4, 4, 0, 0]} />
+        <span className="text-[10px] text-text-muted font-bold tracking-widest uppercase mb-2 block" style={{ fontFamily: "'Sora', sans-serif" }}>
+          시간 (분)
+        </span>
+        <ResponsiveContainer width="100%" height={100}>
+          <BarChart data={data} barCategoryGap="30%">
+            <XAxis dataKey="name" {...axis} tickLine={false} axisLine={false} />
+            <YAxis {...axis} tickLine={false} axisLine={false} width={28} />
+            <Tooltip contentStyle={tooltipStyle} labelStyle={{ color: '#ededf0', fontSize: '11px', fontWeight: 700 }} cursor={{ fill: 'rgba(232,185,49,0.03)' }} />
+            <Bar dataKey="집중" fill="#e8b931" radius={[4, 4, 0, 0]} maxBarSize={18} />
+            <Bar dataKey="산만" fill="#fb7185" radius={[4, 4, 0, 0]} maxBarSize={18} opacity={0.5} />
           </BarChart>
         </ResponsiveContainer>
       </div>
+
+      <div className="h-px bg-surface-border" style={{ opacity: 0.4 }} />
+
       <div>
-        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1.5 }}>금액 (₩)</Typography>
-        <ResponsiveContainer width="100%" height={200}>
-          <BarChart data={data}>
-            <XAxis dataKey="name" stroke="#94A3B8" fontSize={12} />
-            <YAxis stroke="#94A3B8" fontSize={12} />
+        <span className="text-[10px] text-text-muted font-bold tracking-widest uppercase mb-2 block" style={{ fontFamily: "'Sora', sans-serif" }}>
+          금액 (₩)
+        </span>
+        <ResponsiveContainer width="100%" height={100}>
+          <BarChart data={data} barCategoryGap="30%">
+            <XAxis dataKey="name" {...axis} tickLine={false} axisLine={false} />
+            <YAxis {...axis} tickLine={false} axisLine={false} width={36} />
             <Tooltip
-              contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px' }}
-              labelStyle={{ color: '#ffffff' }}
-              formatter={(value) => `₩${Number(value).toLocaleString('ko-KR')}`}
+              contentStyle={tooltipStyle}
+              labelStyle={{ color: '#ededf0', fontSize: '11px', fontWeight: 700 }}
+              formatter={(value: number | string | undefined) => `₩${Number(value ?? 0).toLocaleString('ko-KR')}`}
+              cursor={{ fill: 'rgba(52,211,153,0.03)' }}
             />
-            <Legend />
-            <Bar dataKey="획득" fill="#10B981" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="손실" fill="#EF4444" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="획득" fill="#34d399" radius={[4, 4, 0, 0]} maxBarSize={18} />
+            <Bar dataKey="손실" fill="#fb7185" radius={[4, 4, 0, 0]} maxBarSize={18} opacity={0.5} />
           </BarChart>
         </ResponsiveContainer>
       </div>

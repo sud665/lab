@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { TopBar } from './TopBar';
 import './top-bar.css';
-import '../styles/global.css';
 
 // Create a container for the top bar
 const container = document.createElement('div');
@@ -10,7 +9,7 @@ container.id = 'focus-guard-top-bar';
 document.body.prepend(container);
 
 // Add padding to body to prevent content overlap
-document.body.style.paddingTop = '48px';
+document.body.style.paddingTop = '40px';
 
 // Render the top bar
 const root = ReactDOM.createRoot(container);
