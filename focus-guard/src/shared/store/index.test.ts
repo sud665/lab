@@ -345,3 +345,51 @@ describe('saveToStorage / loadFromStorage', () => {
     expect(useAppStore.getState().tasks).toEqual([]);
   });
 });
+
+// ──────────────────────────────────────────────
+// storageError
+// ──────────────────────────────────────────────
+
+describe('storageError', () => {
+  it('초기 storageError는 null', () => {
+    expect(useAppStore.getState().storageError).toBeNull();
+  });
+
+  it('저장 실패 시 storageError가 설정됨', async () => {
+    const error = new Error('Storage quota exceeded');
+    (chrome.storage.sync.set as ReturnType<typeof vi.fn>).mockRejectedValue(error);
+
+    const promise = useAppStore.getState().saveToStorage();
+
+    // saveWithRetry는 3회 재시도, delay: 500ms, 1000ms
+    await vi.advanceTimersByTimeAsync(500);
+    await vi.advanceTimersByTimeAsync(1000);
+
+    await promise;
+
+    expect(useAppStore.getState().storageError).toBe('Storage quota exceeded');
+  });
+
+  it('저장 성공 후 기존 storageError가 null로 초기화됨', async () => {
+    // 먼저 에러 상태 설정
+    useAppStore.setState({ storageError: '이전 에러' });
+    expect(useAppStore.getState().storageError).toBe('이전 에러');
+
+    // 저장 성공
+    (chrome.storage.sync.set as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
+    await useAppStore.getState().saveToStorage();
+
+    expect(useAppStore.getState().storageError).toBeNull();
+  });
+});
+
+describe('clearStorageError', () => {
+  it('storageError를 null로 초기화', () => {
+    useAppStore.setState({ storageError: '테스트 에러' });
+    expect(useAppStore.getState().storageError).toBe('테스트 에러');
+
+    useAppStore.getState().clearStorageError();
+
+    expect(useAppStore.getState().storageError).toBeNull();
+  });
+});

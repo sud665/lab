@@ -81,7 +81,7 @@ export function TopBar() {
   // ── Distraction Warning Bar ──
   if (isDistracting) {
     return (
-      <div className="fg-bar fg-bar--danger">
+      <div className="fg-bar fg-bar--danger" role="alert" aria-live="assertive" aria-label={`${distractingSiteName}에서 시간 낭비 중 - 손실 ${formatMoney(lostMoney)}`}>
         <div className="fg-left">
           <span className="fg-dot fg-dot--danger" />
           <span className="fg-danger-label">{distractingSiteName}에서 시간 낭비 중</span>
@@ -100,7 +100,7 @@ export function TopBar() {
   // ── Idle Bar (no task) ──
   if (!currentSession.isActive || !currentTask) {
     return (
-      <div className="fg-bar fg-bar--idle">
+      <div className="fg-bar fg-bar--idle" role="status" aria-label="Focus Guard - 대기 중">
         <div className="fg-left">
           <span className="fg-dot fg-dot--idle" />
           <span className="fg-task-name" style={{ color: '#8e8e99' }}>작업을 시작하세요</span>
@@ -119,7 +119,7 @@ export function TopBar() {
   const earnedMoney = calculateMoney(elapsedTime, settings.hourlyRate);
 
   return (
-    <div className="fg-bar fg-bar--active">
+    <div className="fg-bar fg-bar--active" role="status" aria-live="polite" aria-label={`${currentTask.title} 진행 중 - ${formatTime(elapsedTime)}`}>
       <div className="fg-left">
         <span className="fg-dot fg-dot--active" />
         <span className="fg-task-name">{currentTask.title}</span>
@@ -130,7 +130,7 @@ export function TopBar() {
       </div>
 
       <div className="fg-center">
-        <div className="fg-progress">
+        <div className="fg-progress" role="progressbar" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100} aria-label={`작업 진행률 ${progress.toFixed(0)}%`}>
           <div className="fg-progress__fill" style={{ width: `${progress}%` }} />
         </div>
         <div className="fg-progress-label">

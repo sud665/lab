@@ -6,6 +6,7 @@ import { useAnimatedNumber } from '../shared/hooks/useAnimatedNumber';
 import { formatTime, formatMoney, calculateMoney, getCurrentTime } from '../shared/utils/time';
 import { MONO, SORA, hexToRgba } from '../shared/utils/style';
 import { StatsChart } from '../shared/components/StatsChart';
+import { DashboardSkeleton } from '../shared/components/Skeleton';
 
 function getFormattedDate(): string {
   const now = new Date();
@@ -25,7 +26,7 @@ export function Dashboard({ onNavigate }: { onNavigate?: (page: string) => void 
   const [newTaskMinTime, setNewTaskMinTime] = useState(30);
   const [elapsedTime, setElapsedTime] = useState(0);
 
-  useChromeSync();
+  const { isLoading } = useChromeSync();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -69,6 +70,8 @@ export function Dashboard({ onNavigate }: { onNavigate?: (page: string) => void 
   const arcProgress = Math.min(activeFocusTime / goalTotalSeconds, 1);
   const arcHours = Math.floor(activeFocusTime / 3600);
   const arcMinutes = Math.floor((activeFocusTime % 3600) / 60);
+
+  if (isLoading) return <DashboardSkeleton />;
 
   return (
     <div className="min-h-screen bg-surface-deep text-text-primary" style={{ fontFamily: "'Noto Sans KR', 'Sora', sans-serif" }}>
@@ -122,20 +125,20 @@ export function Dashboard({ onNavigate }: { onNavigate?: (page: string) => void 
                 <p className="text-[13px] text-text-muted mb-6">{formattedDate}</p>
 
                 {/* Inline Stats */}
-                <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[14px]" style={MONO}>
-                  <span className="flex items-center gap-1.5 text-gold-400 font-tnum">
+                <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[14px]" style={MONO} aria-live="polite">
+                  <span className="flex items-center gap-1.5 text-gold-400 font-tnum" aria-label={`집중 시간 ${formatTime(animatedFocusTime)}`}>
                     <Clock size={14} className="opacity-60" />
                     <span className="font-semibold">{formatTime(animatedFocusTime)}</span>
                   </span>
-                  <span className="flex items-center gap-1.5 text-earn font-tnum">
+                  <span className="flex items-center gap-1.5 text-earn font-tnum" aria-label={`획득 금액 ${formatMoney(animatedEarned)}`}>
                     <TrendingUp size={14} className="opacity-60" />
                     <span className="font-semibold">{formatMoney(animatedEarned)}</span>
                   </span>
-                  <span className="flex items-center gap-1.5 text-loss font-tnum">
+                  <span className="flex items-center gap-1.5 text-loss font-tnum" aria-label={`손실 금액 ${formatMoney(animatedLost)}`}>
                     <TrendingDown size={14} className="opacity-60" />
                     <span className="font-semibold">{formatMoney(animatedLost)}</span>
                   </span>
-                  <span className="flex items-center gap-1.5 text-text-secondary font-tnum">
+                  <span className="flex items-center gap-1.5 text-text-secondary font-tnum" aria-label={`완료 작업 ${completedCount}개 중 ${tasks.length}개`}>
                     <CheckCircle2 size={14} className="opacity-60" />
                     <span className="font-semibold">{completedCount} / {tasks.length}</span>
                   </span>
@@ -182,6 +185,7 @@ export function Dashboard({ onNavigate }: { onNavigate?: (page: string) => void 
                   onChange={(e) => setNewTaskTitle(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleAddTask()}
                   className="input-base flex-1 px-3 py-2 text-[13px]"
+                  aria-label="새 작업 제목"
                 />
                 <input
                   type="number"
@@ -190,20 +194,21 @@ export function Dashboard({ onNavigate }: { onNavigate?: (page: string) => void 
                   min={5} step={5}
                   className="input-base w-16 px-2 py-2 text-[12px] text-center"
                   style={MONO}
+                  aria-label="목표 시간 (분)"
                 />
                 <span className="text-[11px] text-text-muted">분</span>
-                <button onClick={handleAddTask} className="btn btn-gold px-3.5 py-2 text-[12px]">
+                <button onClick={handleAddTask} className="btn btn-gold px-3.5 py-2 text-[12px]" aria-label="작업 추가">
                   <Plus size={14} /> 추가
                 </button>
               </div>
             </div>
 
             {/* Task Items */}
-            <div className="space-y-2">
+            <div className="space-y-2" role="list" aria-label="작업 목록">
               {tasks.map((task) => {
                 const isActive = currentSession.taskId === task.id;
                 return (
-                  <div key={task.id}
+                  <div key={task.id} role="listitem"
                     className="card rounded-xl px-4 py-3 transition-all duration-200"
                     style={{
                       borderColor: isActive ? 'rgba(232,185,49,0.25)' : undefined,
@@ -363,8 +368,10 @@ function ProgressArc({ progress, hours, minutes, goalHours }: {
   const gradientId = 'arc-gold-gradient';
 
   return (
-    <div className="relative animate-arc-glow" style={{ width: size, height: size }}>
-      <svg viewBox={`0 0 ${size} ${size}`} width={size} height={size} className="block">
+    <div className="relative animate-arc-glow" style={{ width: size, height: size }}
+      role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}
+      aria-label={`일일 목표 진행률 ${pct}%`}>
+      <svg viewBox={`0 0 ${size} ${size}`} width={size} height={size} className="block" aria-hidden="true">
         <defs>
           <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#fcd34d" />

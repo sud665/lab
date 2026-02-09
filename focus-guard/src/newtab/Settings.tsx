@@ -1,16 +1,19 @@
-import { useState } from 'react';
-import { Shield, Zap, Plus, Trash2, Globe, Clock, Target, Banknote, ArrowLeft } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Shield, Zap, Plus, Trash2, Globe, Clock, Target, Banknote, ArrowLeft, Download, Upload, Database, Bell } from 'lucide-react';
 import { useAppStore } from '../shared/store';
 import { useChromeSync } from '../shared/hooks/useChromeSync';
 import { formatMoney } from '../shared/utils/time';
 import { MONO, SORA } from '../shared/utils/style';
+import { exportData, importData } from '../shared/utils/exportImport';
 import type { DistractingSite } from '../shared/types';
 
 export function Settings({ onNavigate }: { onNavigate?: (page: string) => void }) {
-  const { settings, setSettings } = useAppStore();
+  const { settings, setSettings, loadFromStorage } = useAppStore();
   const [newSiteUrl, setNewSiteUrl] = useState('');
   const [newSiteName, setNewSiteName] = useState('');
   const [newSiteAction, setNewSiteAction] = useState<'redirect' | 'effect'>('effect');
+  const [importStatus, setImportStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useChromeSync();
 
@@ -25,6 +28,29 @@ export function Settings({ onNavigate }: { onNavigate?: (page: string) => void }
 
   const handleRemoveSite = (index: number) => {
     setSettings({ distractingSites: settings.distractingSites.filter((_, i) => i !== index) });
+  };
+
+  const handleExport = async () => {
+    try {
+      await exportData();
+    } catch {
+      setImportStatus({ type: 'error', message: '내보내기 중 오류가 발생했습니다.' });
+    }
+  };
+
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImportStatus(null);
+    const result = await importData(file);
+    if (result.success) {
+      await loadFromStorage();
+      setImportStatus({ type: 'success', message: '데이터를 성공적으로 가져왔습니다.' });
+    } else {
+      setImportStatus({ type: 'error', message: result.error ?? '가져오기에 실패했습니다.' });
+    }
+    // 같은 파일 재선택 허용
+    e.target.value = '';
   };
 
   return (
@@ -53,6 +79,7 @@ export function Settings({ onNavigate }: { onNavigate?: (page: string) => void }
               <input type="number" value={settings.hourlyRate}
                 onChange={(e) => setSettings({ hourlyRate: Number(e.target.value) })}
                 step={1000} min={0}
+                aria-label="시급 (원)"
                 className="input-base flex-1 px-4 py-2.5 text-[16px] font-bold" style={MONO} />
               <span className="text-[12px] text-text-muted whitespace-nowrap">원 / 시간</span>
             </div>
@@ -79,7 +106,7 @@ export function Settings({ onNavigate }: { onNavigate?: (page: string) => void }
                 <div className="flex items-center gap-2">
                   <input type="number" value={settings.dailyGoal.hours}
                     onChange={(e) => setSettings({ dailyGoal: { ...settings.dailyGoal, hours: Number(e.target.value) } })}
-                    min={1} max={24}
+                    min={1} max={24} aria-label="일일 집중 목표 시간"
                     className="input-base flex-1 px-3 py-2 text-[15px] font-bold text-center" style={MONO} />
                   <span className="text-[12px] text-text-muted">시간</span>
                 </div>
@@ -89,7 +116,7 @@ export function Settings({ onNavigate }: { onNavigate?: (page: string) => void }
                 <div className="flex items-center gap-2">
                   <input type="number" value={settings.dailyGoal.tasks}
                     onChange={(e) => setSettings({ dailyGoal: { ...settings.dailyGoal, tasks: Number(e.target.value) } })}
-                    min={1} max={20}
+                    min={1} max={20} aria-label="일일 완료 작업 수 목표"
                     className="input-base flex-1 px-3 py-2 text-[15px] font-bold text-center" style={MONO} />
                   <span className="text-[12px] text-text-muted">개</span>
                 </div>
@@ -100,9 +127,9 @@ export function Settings({ onNavigate }: { onNavigate?: (page: string) => void }
 
           {/* ── 방해 사이트 ── */}
           <Section icon={<Globe size={16} className="text-loss" />} title="방해 사이트" goldIcon={false} delay="0.15s">
-            <div className="space-y-2 mb-4">
+            <div className="space-y-2 mb-4" role="list" aria-label="방해 사이트 목록">
               {settings.distractingSites.map((site, index) => (
-                <div key={index} className="flex items-center gap-3 rounded-xl px-4 py-3 bg-surface-base" style={{ border: '1px solid var(--color-surface-border)' }}>
+                <div key={index} role="listitem" className="flex items-center gap-3 rounded-xl px-4 py-3 bg-surface-base" style={{ border: '1px solid var(--color-surface-border)' }}>
                   <Globe size={14} className="text-text-muted flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-[13px] font-semibold text-text-primary">{site.name}</p>
@@ -133,10 +160,12 @@ export function Settings({ onNavigate }: { onNavigate?: (page: string) => void }
               <div className="grid grid-cols-2 gap-2.5 mb-3">
                 <input type="text" placeholder="사이트 이름" value={newSiteName}
                   onChange={(e) => setNewSiteName(e.target.value)}
+                  aria-label="방해 사이트 이름"
                   className="input-base px-3 py-2 text-[12px]" />
                 <input type="text" placeholder="URL (예: twitter.com)" value={newSiteUrl}
                   onChange={(e) => setNewSiteUrl(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleAddSite()}
+                  aria-label="방해 사이트 URL"
                   className="input-base px-3 py-2 text-[12px]" style={MONO} />
               </div>
               <div className="flex items-center gap-2.5">
@@ -171,9 +200,67 @@ export function Settings({ onNavigate }: { onNavigate?: (page: string) => void }
             <div className="flex items-center gap-3">
               <input type="number" value={settings.weeklyGoal.hours}
                 onChange={(e) => setSettings({ weeklyGoal: { hours: Number(e.target.value) } })}
-                min={1} max={168}
+                min={1} max={168} aria-label="주간 목표 시간"
                 className="input-base w-28 px-3 py-2 text-[15px] font-bold text-center" style={MONO} />
               <span className="text-[12px] text-text-muted">시간 / 주</span>
+            </div>
+          </Section>
+
+          {/* ── 알림 설정 ── */}
+          <Section icon={<Bell size={16} />} title="알림 설정" delay="0.25s">
+            <div className="space-y-3">
+              <NotificationToggle
+                label="전체 알림"
+                checked={settings.notifications.enabled}
+                onChange={(v) => setSettings({ notifications: { ...settings.notifications, enabled: v } })}
+              />
+              <div className="divider" />
+              <NotificationToggle
+                label="작업 완료 알림"
+                desc="작업의 목표 시간 도달 시 알림"
+                checked={settings.notifications.sessionComplete}
+                disabled={!settings.notifications.enabled}
+                onChange={(v) => setSettings({ notifications: { ...settings.notifications, sessionComplete: v } })}
+              />
+              <NotificationToggle
+                label="방해 사이트 경고"
+                desc="방해 사이트 접속 시 알림"
+                checked={settings.notifications.distractionAlert}
+                disabled={!settings.notifications.enabled}
+                onChange={(v) => setSettings({ notifications: { ...settings.notifications, distractionAlert: v } })}
+              />
+              <NotificationToggle
+                label="목표 달성 알림"
+                desc="일일 목표 달성 시 축하 알림"
+                checked={settings.notifications.goalAchieved}
+                disabled={!settings.notifications.enabled}
+                onChange={(v) => setSettings({ notifications: { ...settings.notifications, goalAchieved: v } })}
+              />
+            </div>
+          </Section>
+
+          {/* ── 데이터 관리 ── */}
+          <Section icon={<Database size={16} />} title="데이터 관리" delay="0.3s">
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <button onClick={handleExport}
+                  className="btn flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-[12px] font-bold transition-all duration-200 cursor-pointer"
+                  style={{ background: 'var(--color-surface-base)', border: '1px solid var(--color-surface-border)', color: 'var(--color-text-primary)' }}>
+                  <Download size={14} /> 내보내기
+                </button>
+                <button onClick={() => fileInputRef.current?.click()}
+                  className="btn flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-[12px] font-bold transition-all duration-200 cursor-pointer"
+                  style={{ background: 'var(--color-surface-base)', border: '1px solid var(--color-surface-border)', color: 'var(--color-text-primary)' }}>
+                  <Upload size={14} /> 가져오기
+                </button>
+                <input ref={fileInputRef} type="file" accept=".json" onChange={handleImport} className="hidden" />
+              </div>
+              {importStatus && (
+                <p className={`text-[12px] font-semibold ${importStatus.type === 'success' ? 'text-earn' : 'text-loss'}`}>
+                  {importStatus.message}
+                </p>
+              )}
+              <p className="text-[11px] text-text-muted">설정, 작업, 통계 데이터를 JSON 파일로 백업하거나 복원할 수 있습니다.</p>
             </div>
           </Section>
         </div>
@@ -198,11 +285,45 @@ function Section({ icon, title, children, goldIcon = true, delay }: {
   );
 }
 
+function NotificationToggle({ label, desc, checked, disabled, onChange }: {
+  label: string; desc?: string; checked: boolean; disabled?: boolean; onChange: (v: boolean) => void;
+}) {
+  return (
+    <div className={`flex items-center justify-between py-1 ${disabled ? 'opacity-40' : ''}`}>
+      <div className="min-w-0">
+        <p className="text-[13px] font-medium text-text-primary">{label}</p>
+        {desc && <p className="text-[11px] text-text-muted mt-0.5">{desc}</p>}
+      </div>
+      <button
+        role="switch"
+        aria-checked={checked}
+        aria-label={label}
+        disabled={disabled}
+        onClick={() => !disabled && onChange(!checked)}
+        className="relative flex-shrink-0 w-10 h-[22px] rounded-full transition-colors duration-200 cursor-pointer border-none"
+        style={{
+          background: checked ? 'rgba(232,185,49,0.25)' : 'var(--color-surface-elevated)',
+          border: `1px solid ${checked ? 'rgba(232,185,49,0.3)' : 'var(--color-surface-border)'}`,
+        }}
+      >
+        <span
+          className="absolute top-[2px] w-4 h-4 rounded-full transition-all duration-200"
+          style={{
+            left: checked ? '20px' : '2px',
+            background: checked ? '#e8b931' : 'var(--color-text-muted)',
+          }}
+        />
+      </button>
+    </div>
+  );
+}
+
 function ModeCard({ active, onClick, icon, title, desc }: {
   active: boolean; onClick: () => void; icon: React.ReactNode; title: string; desc: string;
 }) {
   return (
     <button onClick={onClick}
+      aria-pressed={active}
       className="rounded-xl p-4 text-left transition-all duration-200 cursor-pointer"
       style={{
         background: active ? 'rgba(232,185,49,0.06)' : 'var(--color-surface-base)',

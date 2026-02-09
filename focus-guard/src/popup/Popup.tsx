@@ -4,13 +4,18 @@ import { useAppStore } from '../shared/store';
 import { useChromeSync } from '../shared/hooks/useChromeSync';
 import { formatTime, formatMoney, calculateMoney, getCurrentTime } from '../shared/utils/time';
 import { MONO, SORA, BODY_FONT, COLORS, hexToRgba } from '../shared/utils/style';
+import { PopupSkeleton } from '../shared/components/Skeleton';
+
+function openNewTab() {
+  chrome.tabs.create({ url: chrome.runtime.getURL('src/newtab/index.html') });
+}
 
 export function Popup() {
   const { settings, currentSession, tasks, rewardStatus, stopTask, setSettings, getDailyStats } = useAppStore();
   const [currentTime, setCurrentTime] = useState(getCurrentTime());
   const [elapsedTime, setElapsedTime] = useState(0);
 
-  useChromeSync();
+  const { isLoading } = useChromeSync();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -27,6 +32,8 @@ export function Popup() {
   const currentTask = tasks.find((t) => t.id === currentSession.taskId);
   const todayStats = getDailyStats();
   const isRewardActive = rewardStatus.unlimitedUntil !== null && Date.now() < rewardStatus.unlimitedUntil;
+
+  if (isLoading) return <PopupSkeleton />;
 
   return (
     <div className="w-[360px] bg-surface-deep text-text-primary" style={BODY_FONT}>
@@ -69,7 +76,7 @@ export function Popup() {
                   진행 중
                 </span>
               </div>
-              <button onClick={stopTask} className="btn btn-danger px-2.5 py-1 text-[11px]">
+              <button onClick={stopTask} className="btn btn-danger px-2.5 py-1 text-[11px]" aria-label="작업 중지">
                 <Pause size={11} /> 중지
               </button>
             </div>
@@ -77,7 +84,10 @@ export function Popup() {
             <p className="text-[15px] font-semibold text-text-primary mb-3 leading-snug">{currentTask.title}</p>
 
             {/* Progress */}
-            <div className="mb-3">
+            <div className="mb-3" role="progressbar"
+              aria-valuenow={Math.min(Math.round((elapsedTime / (currentTask.minTime * 60)) * 100), 100)}
+              aria-valuemin={0} aria-valuemax={100}
+              aria-label={`작업 진행률 ${Math.min(Math.round((elapsedTime / (currentTask.minTime * 60)) * 100), 100)}%`}>
               <div className="progress-track" style={{ height: '4px' }}>
                 <div className="progress-fill"
                   style={{
@@ -117,7 +127,7 @@ export function Popup() {
         )}
 
         {/* ── Stats Grid 2x2 ── */}
-        <div className="grid grid-cols-2 gap-2.5">
+        <div className="grid grid-cols-2 gap-2.5" aria-live="polite">
           <PopupStat label="집중 시간" value={formatTime(todayStats.totalFocusTime)} accent={COLORS.gold400} icon={<Clock size={13} />} />
           <PopupStat label="획득 금액" value={formatMoney(todayStats.earnedMoney)} accent={COLORS.earn} icon={<TrendingUp size={13} />} />
           <PopupStat label="손실 금액" value={formatMoney(todayStats.lostMoney)} accent={COLORS.loss} icon={<TrendingDown size={13} />} />
@@ -143,6 +153,7 @@ export function Popup() {
               value={settings.hourlyRate}
               onChange={(e) => setSettings({ hourlyRate: Number(e.target.value) })}
               step={1000}
+              aria-label="시급 (원)"
               className="input-base flex-1 px-3 py-1.5 text-[15px] font-bold"
               style={MONO}
             />
@@ -177,6 +188,7 @@ function ModeBtn({ active, onClick, icon, label }: { active: boolean; onClick: (
   return (
     <button
       onClick={onClick}
+      aria-pressed={active}
       className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[12px] font-bold transition-all duration-200 cursor-pointer"
       style={{
         background: active ? 'rgba(232,185,49,0.1)' : 'transparent',

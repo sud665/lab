@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { CurrentSession, Task, UserSettings, DailyStats, RewardStatus } from '../types';
 import { calculateMoney, getTodayDateString } from '../utils/time';
+import { saveWithRetry } from '../utils/storage';
 
 interface AppState {
   settings: UserSettings;
@@ -8,6 +9,7 @@ interface AppState {
   tasks: Task[];
   dailyStatsMap: Record<string, DailyStats>;
   rewardStatus: RewardStatus;
+  storageError: string | null;
 
   // Actions
   setSettings: (settings: Partial<UserSettings>) => void;
@@ -19,6 +21,7 @@ interface AppState {
   deleteTask: (taskId: string) => void;
   loadFromStorage: () => Promise<void>;
   saveToStorage: () => Promise<void>;
+  clearStorageError: () => void;
 
   // Phase 2 Actions
   getDailyStats: () => DailyStats;
@@ -42,6 +45,12 @@ const DEFAULT_SETTINGS: UserSettings = {
   weeklyGoal: {
     hours: 30,
   },
+  notifications: {
+    enabled: true,
+    sessionComplete: true,
+    distractionAlert: true,
+    goalAchieved: true,
+  },
 };
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -58,6 +67,9 @@ export const useAppStore = create<AppState>((set, get) => ({
     unlimitedUntil: null,
     bonusMinutes: 0,
   },
+  storageError: null,
+
+  clearStorageError: () => set({ storageError: null }),
 
   setSettings: (newSettings) => {
     set((state) => ({
@@ -258,15 +270,20 @@ export const useAppStore = create<AppState>((set, get) => ({
   saveToStorage: async () => {
     try {
       const { settings, currentSession, tasks, dailyStatsMap, rewardStatus } = get();
-      await chrome.storage.sync.set({
+      await saveWithRetry({
         settings,
         currentSession,
         tasks,
         dailyStatsMap,
         rewardStatus,
       });
+      if (get().storageError) {
+        set({ storageError: null });
+      }
     } catch (error) {
+      const message = error instanceof Error ? error.message : '저장 중 알 수 없는 오류가 발생했습니다.';
       console.error('Failed to save to storage:', error);
+      set({ storageError: message });
     }
   },
 }));

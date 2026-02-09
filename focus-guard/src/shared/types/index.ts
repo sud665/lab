@@ -1,3 +1,10 @@
+export interface NotificationSettings {
+  enabled: boolean;
+  sessionComplete: boolean;
+  distractionAlert: boolean;
+  goalAchieved: boolean;
+}
+
 export interface UserSettings {
   hourlyRate: number;
   mode: 'strict' | 'auto';
@@ -9,6 +16,7 @@ export interface UserSettings {
   weeklyGoal: {
     hours: number;
   };
+  notifications: NotificationSettings;
 }
 
 export interface DistractingSite {
