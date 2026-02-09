@@ -1,0 +1,324 @@
+---
+title: "React Three Fiber로 인터랙티브 3D 웹 만들기"
+description: "React Three Fiber의 기본 개념부터 애니메이션, 성능 최적화까지. 선언적 React 문법으로 Three.js의 강력한 3D 렌더링을 다루는 실전 가이드입니다."
+date: "2025-02-01"
+tags: [React, Three.js, 3D, WebGL]
+readingTime: "10 min read"
+---
+
+## React Three Fiber란
+
+React Three Fiber(R3F)는 Three.js를 위한 React 렌더러입니다. Three.js의 모든 기능을 선언적인 React 컴포넌트로 사용할 수 있게 해줍니다.
+
+> Three.js의 강력함 + React의 선언적 패러다임 = React Three Fiber
+
+명령형으로 scene을 구성하는 대신, JSX로 3D 씬을 선언합니다.
+
+```tsx
+// Three.js 명령형 방식
+const geometry = new THREE.BoxGeometry(1, 1, 1)
+const material = new THREE.MeshStandardMaterial({ color: 'orange' })
+const mesh = new THREE.Mesh(geometry, material)
+scene.add(mesh)
+
+// React Three Fiber 선언형 방식
+function Box() {
+  return (
+    <mesh>
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial color="orange" />
+    </mesh>
+  )
+}
+```
+
+## Canvas 설정과 씬 구성
+
+R3F의 모든 것은 `Canvas` 컴포넌트 안에서 시작됩니다.
+
+```tsx
+import { Canvas } from '@react-three/fiber'
+import { OrbitControls, Environment } from '@react-three/drei'
+
+function Scene() {
+  return (
+    <div style={{ width: '100vw', height: '100vh' }}>
+      <Canvas
+        camera={{ position: [0, 2, 5], fov: 45 }}
+        gl={{ antialias: true, alpha: true }}
+      >
+        {/* 조명 */}
+        <ambientLight intensity={0.5} />
+        <directionalLight position={[5, 5, 5]} intensity={1} />
+
+        {/* 3D 오브젝트 */}
+        <Box position={[0, 0, 0]} />
+        <Ground />
+
+        {/* 카메라 컨트롤 */}
+        <OrbitControls enableDamping dampingFactor={0.05} />
+
+        {/* HDR 환경맵 */}
+        <Environment preset="city" />
+      </Canvas>
+    </div>
+  )
+}
+```
+
+### Camera 설정 팁
+
+- `fov`: 화각. 포트폴리오에는 35-50이 자연스럽습니다
+- `near`/`far`: 클리핑 평면. 기본값으로 충분한 경우가 많습니다
+- `position`: `[x, y, z]` 배열. y가 위쪽입니다
+
+## Geometry와 Material
+
+R3F에서는 Three.js의 모든 Geometry와 Material을 카멜케이스 JSX 태그로 사용합니다.
+
+```tsx
+function Shapes() {
+  return (
+    <group>
+      {/* 구체 */}
+      <mesh position={[-2, 0, 0]}>
+        <sphereGeometry args={[1, 32, 32]} />
+        <meshStandardMaterial
+          color="#6366f1"
+          metalness={0.3}
+          roughness={0.4}
+        />
+      </mesh>
+
+      {/* 토러스 */}
+      <mesh position={[2, 0, 0]} rotation={[Math.PI / 4, 0, 0]}>
+        <torusGeometry args={[1, 0.4, 16, 48]} />
+        <meshPhysicalMaterial
+          color="#818cf8"
+          transmission={0.6}
+          thickness={0.5}
+          roughness={0.1}
+        />
+      </mesh>
+
+      {/* 바닥면 */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.5, 0]}>
+        <planeGeometry args={[20, 20]} />
+        <meshStandardMaterial color="#1a1a1a" />
+      </mesh>
+    </group>
+  )
+}
+```
+
+### Material 선택 가이드
+
+| Material | 용도 | 비용 |
+|----------|------|------|
+| `meshBasicMaterial` | 조명 무시, 단색 | 가장 저렴 |
+| `meshStandardMaterial` | PBR, 일반적인 용도 | 중간 |
+| `meshPhysicalMaterial` | 유리, 투명, 코팅 효과 | 비쌈 |
+| `shaderMaterial` | 커스텀 셰이더 | 구현에 따라 다름 |
+
+## useFrame으로 애니메이션
+
+`useFrame`은 매 프레임마다 호출되는 훅입니다. Three.js의 `requestAnimationFrame` 루프에 해당합니다.
+
+```tsx
+import { useRef } from 'react'
+import { useFrame } from '@react-three/fiber'
+import type { Mesh } from 'three'
+
+function RotatingBox() {
+  const meshRef = useRef<Mesh>(null)
+
+  useFrame((state, delta) => {
+    if (!meshRef.current) return
+
+    // 매 프레임 회전
+    meshRef.current.rotation.y += delta * 0.5
+    meshRef.current.rotation.x += delta * 0.2
+
+    // 사인파로 부드러운 상하 운동
+    meshRef.current.position.y = Math.sin(state.clock.elapsedTime) * 0.3
+  })
+
+  return (
+    <mesh ref={meshRef}>
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial color="#6366f1" />
+    </mesh>
+  )
+}
+```
+
+### delta를 사용하는 이유
+
+`delta`는 이전 프레임과의 시간 차이(초)입니다. 고정값 대신 `delta`를 곱하면 프레임률에 관계없이 일정한 속도로 애니메이션됩니다.
+
+```tsx
+// 나쁜 예: 60fps에서는 빠르고 30fps에서는 느림
+meshRef.current.rotation.y += 0.01
+
+// 좋은 예: 프레임률에 독립적
+meshRef.current.rotation.y += delta * 0.5
+```
+
+## 마우스 인터랙션
+
+R3F는 Three.js의 레이캐스팅을 React 이벤트 시스템으로 감싸줍니다.
+
+```tsx
+import { useState } from 'react'
+
+function InteractiveBox() {
+  const [hovered, setHovered] = useState(false)
+  const [clicked, setClicked] = useState(false)
+
+  return (
+    <mesh
+      scale={clicked ? 1.5 : 1}
+      onClick={() => setClicked(!clicked)}
+      onPointerOver={() => setHovered(true)}
+      onPointerOut={() => setHovered(false)}
+    >
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial color={hovered ? '#818cf8' : '#6366f1'} />
+    </mesh>
+  )
+}
+```
+
+## drei - 유용한 헬퍼 모음
+
+`@react-three/drei`는 R3F와 함께 자주 쓰이는 유틸리티 컴포넌트 라이브러리입니다.
+
+```tsx
+import {
+  Text,
+  Float,
+  MeshDistortMaterial,
+  GradientTexture,
+} from '@react-three/drei'
+
+function HeroScene() {
+  return (
+    <>
+      {/* 떠다니는 효과 */}
+      <Float speed={2} rotationIntensity={0.5} floatIntensity={1}>
+        <mesh>
+          <sphereGeometry args={[1.5, 64, 64]} />
+          <MeshDistortMaterial
+            color="#6366f1"
+            speed={3}
+            distort={0.3}
+            radius={1}
+          />
+        </mesh>
+      </Float>
+
+      {/* 3D 텍스트 */}
+      <Text
+        position={[0, -2, 0]}
+        fontSize={0.5}
+        color="white"
+        anchorX="center"
+      >
+        Hello, 3D World
+      </Text>
+    </>
+  )
+}
+```
+
+## 성능 최적화
+
+3D 렌더링은 무겁습니다. 특히 모바일에서는 최적화가 필수입니다.
+
+### 1. Instanced Mesh
+
+같은 geometry를 여러 번 렌더링할 때, InstancedMesh로 드로콜을 줄입니다.
+
+```tsx
+import { useRef, useMemo } from 'react'
+import { useFrame } from '@react-three/fiber'
+import { Object3D, InstancedMesh as InstancedMeshType } from 'three'
+
+const COUNT = 1000
+const temp = new Object3D()
+
+function Particles() {
+  const meshRef = useRef<InstancedMeshType>(null)
+
+  const positions = useMemo(() => {
+    return Array.from({ length: COUNT }, () => ({
+      x: (Math.random() - 0.5) * 10,
+      y: (Math.random() - 0.5) * 10,
+      z: (Math.random() - 0.5) * 10,
+      speed: 0.5 + Math.random() * 0.5,
+    }))
+  }, [])
+
+  useFrame((state) => {
+    if (!meshRef.current) return
+
+    positions.forEach((p, i) => {
+      const t = state.clock.elapsedTime * p.speed
+      temp.position.set(p.x, p.y + Math.sin(t) * 0.5, p.z)
+      temp.scale.setScalar(0.05)
+      temp.updateMatrix()
+      meshRef.current!.setMatrixAt(i, temp.matrix)
+    })
+
+    meshRef.current.instanceMatrix.needsUpdate = true
+  })
+
+  return (
+    <instancedMesh ref={meshRef} args={[undefined, undefined, COUNT]}>
+      <sphereGeometry args={[1, 8, 8]} />
+      <meshBasicMaterial color="#6366f1" />
+    </instancedMesh>
+  )
+}
+```
+
+### 2. frameloop 제어
+
+정적인 장면에서는 `frameloop="demand"`로 불필요한 렌더링을 방지합니다.
+
+```tsx
+<Canvas frameloop="demand">
+  {/* 변경이 있을 때만 렌더링 */}
+</Canvas>
+```
+
+### 3. 모바일 대응
+
+```tsx
+import { useThree } from '@react-three/fiber'
+
+function AdaptivePixelRatio() {
+  const { gl } = useThree()
+
+  useEffect(() => {
+    // 모바일에서 픽셀 비율 제한
+    gl.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+  }, [gl])
+
+  return null
+}
+```
+
+### 성능 체크리스트
+
+- Geometry의 segment 수를 필요 이상으로 높이지 않기
+- `dispose()`로 사용하지 않는 리소스 정리
+- `useMemo`로 계산 비용이 큰 값 캐싱
+- 개발 시 `<Perf />`(r3f-perf)로 실시간 모니터링
+- 그림자는 필요한 오브젝트에만 적용
+
+## 마무리
+
+React Three Fiber는 React 개발자가 3D 웹을 만드는 가장 자연스러운 방법입니다. 선언적 패러다임 덕분에 복잡한 Three.js 코드를 깔끔하게 관리할 수 있고, React 생태계의 도구들(상태 관리, 라우팅 등)과 자연스럽게 통합됩니다.
+
+포트폴리오, 제품 랜딩 페이지, 데이터 시각화 등 다양한 분야에서 3D를 활용해보세요. 처음에는 간단한 도형과 애니메이션부터 시작하는 것을 추천합니다.

@@ -1,0 +1,245 @@
+---
+title: "AI 에이전트 시스템 구축기"
+description: "멀티 에이전트 아키텍처 설계부터 Claude API를 활용한 Tool Use 패턴, 실전 에러 처리 전략까지 AI 에이전트 시스템을 구축하며 배운 것들을 정리합니다."
+date: "2025-01-15"
+tags: [AI, Agent, LLM, TypeScript]
+readingTime: "8 min read"
+---
+
+## 왜 에이전트인가
+
+단순 프롬프트 호출을 넘어, AI 에이전트는 **자율적으로 도구를 사용하고 의사결정을 반복**할 수 있습니다. 사용자가 "이 코드에 테스트를 작성해줘"라고 하면, 에이전트는 파일을 읽고, 의존성을 파악하고, 테스트를 생성하고, 실행까지 합니다.
+
+> 에이전트 = LLM + 도구 사용 + 반복 루프 + 메모리
+
+이 글에서는 TypeScript로 멀티 에이전트 시스템을 설계하고 운영하면서 얻은 실전 인사이트를 공유합니다.
+
+## 멀티 에이전트 아키텍처
+
+단일 에이전트로 모든 작업을 처리하면 컨텍스트 윈도우가 빠르게 소진됩니다. 역할별로 에이전트를 분리하면 각자 집중할 수 있습니다.
+
+```typescript
+interface AgentConfig {
+  name: string
+  role: 'leader' | 'worker'
+  tools: Tool[]
+  systemPrompt: string
+}
+
+const teamConfig: AgentConfig[] = [
+  {
+    name: 'team-lead',
+    role: 'leader',
+    tools: [taskCreate, taskAssign, codeReview],
+    systemPrompt: 'You coordinate the team and review code quality.',
+  },
+  {
+    name: 'frontend-dev',
+    role: 'worker',
+    tools: [readFile, writeFile, runTests],
+    systemPrompt: 'You implement React components with TypeScript.',
+  },
+  {
+    name: 'tester',
+    role: 'worker',
+    tools: [readFile, writeFile, runTests, analyzeeCoverage],
+    systemPrompt: 'You write comprehensive tests and verify quality.',
+  },
+]
+```
+
+### 핵심 원칙
+
+- **리더 에이전트**는 작업을 분배하고 결과를 검증합니다
+- **워커 에이전트**는 할당받은 작업에만 집중합니다
+- 파일 충돌을 방지하기 위해 각 에이전트가 담당하는 파일 범위를 명확히 합니다
+- 종속성이 있는 작업은 `blockedBy`로 순서를 관리합니다
+
+## Claude API와 Tool Use
+
+Claude의 Tool Use는 에이전트 시스템의 핵심입니다. 도구를 정의하면 모델이 언제 어떤 도구를 호출할지 판단합니다.
+
+```typescript
+import Anthropic from '@anthropic-ai/sdk'
+
+const client = new Anthropic()
+
+const tools: Anthropic.Tool[] = [
+  {
+    name: 'read_file',
+    description: 'Read the contents of a file at the given path',
+    input_schema: {
+      type: 'object' as const,
+      properties: {
+        path: { type: 'string', description: 'Absolute file path' },
+      },
+      required: ['path'],
+    },
+  },
+  {
+    name: 'write_file',
+    description: 'Write content to a file, creating it if needed',
+    input_schema: {
+      type: 'object' as const,
+      properties: {
+        path: { type: 'string', description: 'Absolute file path' },
+        content: { type: 'string', description: 'File content' },
+      },
+      required: ['path', 'content'],
+    },
+  },
+]
+
+async function runAgent(prompt: string) {
+  const messages: Anthropic.MessageParam[] = [
+    { role: 'user', content: prompt },
+  ]
+
+  while (true) {
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 4096,
+      tools,
+      messages,
+    })
+
+    // 텍스트 응답 수집
+    for (const block of response.content) {
+      if (block.type === 'text') {
+        console.log(block.text)
+      }
+    }
+
+    // 도구 호출이 없으면 종료
+    if (response.stop_reason !== 'tool_use') break
+
+    // 도구 실행 및 결과 반환
+    const toolResults = await executeTools(response.content)
+    messages.push({ role: 'assistant', content: response.content })
+    messages.push({ role: 'user', content: toolResults })
+  }
+}
+```
+
+### 도구 실행 함수
+
+```typescript
+async function executeTools(
+  content: Anthropic.ContentBlock[]
+): Promise<Anthropic.ToolResultBlockParam[]> {
+  const results: Anthropic.ToolResultBlockParam[] = []
+
+  for (const block of content) {
+    if (block.type !== 'tool_use') continue
+
+    try {
+      const output = await handleTool(block.name, block.input)
+      results.push({
+        type: 'tool_result',
+        tool_use_id: block.id,
+        content: JSON.stringify(output),
+      })
+    } catch (error) {
+      results.push({
+        type: 'tool_result',
+        tool_use_id: block.id,
+        is_error: true,
+        content: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      })
+    }
+  }
+
+  return results
+}
+```
+
+## 에러 처리와 재시도 전략
+
+LLM API 호출은 실패할 수 있습니다. Rate limit, 네트워크 오류, 잘못된 도구 호출 등 다양한 실패 상황에 대비해야 합니다.
+
+```typescript
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  options: { maxRetries?: number; baseDelay?: number } = {}
+): Promise<T> {
+  const { maxRetries = 3, baseDelay = 1000 } = options
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn()
+    } catch (error) {
+      if (attempt === maxRetries) throw error
+
+      const isRetryable =
+        error instanceof Anthropic.RateLimitError ||
+        error instanceof Anthropic.APIConnectionError
+
+      if (!isRetryable) throw error
+
+      const delay = baseDelay * Math.pow(2, attempt)
+      console.log(`Retry ${attempt + 1}/${maxRetries} after ${delay}ms`)
+      await new Promise((r) => setTimeout(r, delay))
+    }
+  }
+
+  throw new Error('Unreachable')
+}
+```
+
+### 잘못된 도구 호출 처리
+
+모델이 존재하지 않는 도구를 호출하거나 잘못된 파라미터를 전달할 수 있습니다. 이런 경우 에러를 모델에게 돌려보내면 스스로 수정합니다.
+
+```typescript
+async function handleTool(name: string, input: unknown) {
+  const handler = toolHandlers[name]
+
+  if (!handler) {
+    throw new Error(
+      `Unknown tool: ${name}. Available tools: ${Object.keys(toolHandlers).join(', ')}`
+    )
+  }
+
+  // 입력 검증
+  const parsed = handler.schema.safeParse(input)
+  if (!parsed.success) {
+    throw new Error(
+      `Invalid input for ${name}: ${parsed.error.message}`
+    )
+  }
+
+  return handler.execute(parsed.data)
+}
+```
+
+## 실전에서 배운 것들
+
+### 컨텍스트 윈도우 관리
+
+에이전트가 오래 동작하면 대화 히스토리가 쌓입니다. 요약 전략이 필수입니다.
+
+- 오래된 메시지를 주기적으로 요약하여 압축
+- 도구 결과 중 대용량 출력은 잘라내기
+- 핵심 정보만 메모리에 기록하여 재활용
+
+### 작업 분배 균형
+
+멀티 에이전트 운영 시 워크로드 균형이 중요합니다. 한 에이전트가 먼저 끝나면 대기 시간이 발생합니다.
+
+- 에이전트당 3-4개 작업이 적정
+- 테스트 에이전트는 항상 마지막에 작업 (다른 에이전트의 결과물을 검증해야 하므로)
+- 파일 충돌 방지를 위해 에이전트별 담당 파일 범위를 명확히 지정
+
+### 안전 장치
+
+에이전트가 의도치 않은 파괴적 작업을 수행하지 않도록 가드레일을 설정합니다.
+
+- `rm -rf`, `git push --force` 등 위험한 명령어 차단
+- 파일 변경 전 백업 생성
+- 각 도구에 권한 레벨을 부여하여 승인 없이 실행할 수 있는 범위를 제한
+
+## 마무리
+
+AI 에이전트 시스템은 단순한 챗봇을 넘어, 실제 소프트웨어 개발 작업을 자동화할 수 있는 강력한 도구입니다. 핵심은 명확한 역할 분리, 견고한 에러 처리, 그리고 적절한 안전 장치입니다.
+
+다음 글에서는 에이전트가 생성한 코드의 품질을 자동으로 평가하는 시스템에 대해 다루겠습니다.
