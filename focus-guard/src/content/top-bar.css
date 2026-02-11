@@ -304,7 +304,107 @@
 
   .fg-bar--danger,
   .fg-dot--active,
-  .fg-dot--danger {
+  .fg-dot--danger,
+  .fg-pill,
+  .fg-pill--danger {
     animation: none;
   }
+
+  .fg-collapse-btn {
+    transition: none;
+  }
+}
+
+/* --- Collapse Button --- */
+
+#focus-guard-top-bar .fg-collapse-btn {
+  all: unset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--fg-text-secondary);
+  opacity: 0;
+  transition: opacity 0.2s ease, background 0.15s ease, color 0.15s ease;
+  flex-shrink: 0;
+  margin-left: 4px;
+}
+
+.fg-bar:hover .fg-collapse-btn {
+  opacity: 0.6;
+}
+
+#focus-guard-top-bar .fg-collapse-btn:hover {
+  opacity: 1;
+  background: rgba(255,255,255,0.08);
+  color: var(--fg-text);
+}
+
+/* --- Collapsed Pill --- */
+
+#focus-guard-top-bar .fg-pill {
+  position: fixed;
+  top: 8px;
+  right: 16px;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: var(--fg-font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  font-feature-settings: 'tnum' 1;
+  -webkit-font-smoothing: antialiased;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  border: none;
+  outline: none;
+  line-height: 1;
+}
+
+#focus-guard-top-bar .fg-pill:hover {
+  transform: scale(1.05);
+}
+
+#focus-guard-top-bar .fg-pill .fg-dot {
+  width: 6px;
+  height: 6px;
+}
+
+.fg-pill--idle {
+  background: rgba(10,10,12,0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(51,51,57,0.5);
+  color: #8e8e99;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+
+.fg-pill--active {
+  background: rgba(10,10,12,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(232,185,49,0.2);
+  color: var(--fg-earn);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3), 0 0 8px rgba(232,185,49,0.08);
+}
+
+.fg-pill--danger {
+  background: rgba(80,15,15,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(244,63,94,0.3);
+  color: #fca5a5;
+  box-shadow: 0 2px 12px rgba(244,63,94,0.15);
+  animation: fg-danger-pulse 2.5s ease-in-out infinite;
+}
+
+.fg-pill__label {
+  line-height: 1;
 }

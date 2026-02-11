@@ -19,6 +19,7 @@ interface AppState {
   addTask: (task: Omit<Task, 'id' | 'totalTime' | 'isCompleted'>) => void;
   updateTask: (taskId: string, updates: Partial<Task>) => void;
   deleteTask: (taskId: string) => void;
+  restoreTask: (task: Task) => void;
   loadFromStorage: () => Promise<void>;
   saveToStorage: () => Promise<void>;
   clearStorageError: () => void;
@@ -150,6 +151,13 @@ export const useAppStore = create<AppState>((set, get) => ({
   deleteTask: (taskId) => {
     set((state) => ({
       tasks: state.tasks.filter((task) => task.id !== taskId),
+    }));
+    get().saveToStorage();
+  },
+
+  restoreTask: (task) => {
+    set((state) => ({
+      tasks: [...state.tasks, task],
     }));
     get().saveToStorage();
   },

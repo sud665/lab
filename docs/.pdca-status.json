@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-02-05T07:24:48.629Z",
+  "lastUpdated": "2026-02-11T05:37:32.901Z",
   "activeFeatures": [
     "wireframe-v2",
     "ai-page-generator",
@@ -14,7 +14,13 @@
     "analytics",
     "wireframe-boilerplate",
     "ranking",
-    "settings"
+    "settings",
+    "content",
+    "store",
+    "popup",
+    "newtab",
+    "focus-guard",
+    "dev"
   ],
   "primaryFeature": "wireframe-v2",
   "features": {
@@ -193,6 +199,84 @@
         "lastUpdated": "2026-02-05T07:24:18.937Z"
       },
       "lastFile": "/Users/max/Desktop/lab/super-admin/app/settings/page.tsx"
+    },
+    "content": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-11T02:19:45.741Z",
+        "lastUpdated": "2026-02-11T04:32:50.682Z"
+      },
+      "lastFile": "/Users/max/Desktop/lab/focus-guard/src/content/TopBar.tsx"
+    },
+    "store": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-11T02:24:46.983Z",
+        "lastUpdated": "2026-02-11T02:24:47.058Z"
+      },
+      "lastFile": "/Users/max/Desktop/lab/focus-guard/src/shared/store/index.ts"
+    },
+    "popup": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-11T02:24:47.123Z",
+        "lastUpdated": "2026-02-11T04:33:00.285Z"
+      },
+      "lastFile": "/Users/max/Desktop/lab/focus-guard/src/popup/Popup.tsx"
+    },
+    "newtab": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-11T02:24:47.206Z",
+        "lastUpdated": "2026-02-11T05:37:32.901Z"
+      },
+      "lastFile": "/Users/max/Desktop/lab/focus-guard/src/newtab/Dashboard.tsx"
+    },
+    "focus-guard": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-11T04:13:35.128Z",
+        "lastUpdated": "2026-02-11T04:13:35.128Z"
+      },
+      "lastFile": "/Users/max/Desktop/lab/focus-guard/src/shared/components/BrandLogo.tsx"
+    },
+    "dev": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-11T05:37:23.413Z",
+        "lastUpdated": "2026-02-11T05:37:23.413Z"
+      },
+      "lastFile": "/Users/max/Desktop/lab/focus-guard/src/dev/index.tsx"
     }
   },
   "pipeline": {
@@ -203,7 +287,7 @@
   "session": {
     "startedAt": "2026-02-05T00:00:00.000Z",
     "onboardingCompleted": true,
-    "lastActivity": "2026-02-05T07:24:48.629Z"
+    "lastActivity": "2026-02-11T05:37:32.901Z"
   },
   "history": [
     {
@@ -604,6 +688,384 @@
     {
       "timestamp": "2026-02-05T07:24:48.629Z",
       "feature": "generator",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:19:45.741Z",
+      "feature": "content",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:24:46.983Z",
+      "feature": "store",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:24:47.058Z",
+      "feature": "store",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:24:47.123Z",
+      "feature": "popup",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:24:47.206Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:24:47.276Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:24:57.069Z",
+      "feature": "popup",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:25:06.966Z",
+      "feature": "popup",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:25:11.539Z",
+      "feature": "popup",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:25:11.748Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:25:16.881Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:25:23.714Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:25:29.798Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:25:49.770Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:39:29.576Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:39:34.022Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:39:47.551Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:39:56.294Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:40:03.253Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:40:10.214Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:42:13.543Z",
+      "feature": "popup",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:42:17.413Z",
+      "feature": "popup",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:42:21.450Z",
+      "feature": "popup",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:42:25.416Z",
+      "feature": "popup",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:42:30.621Z",
+      "feature": "popup",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:42:34.787Z",
+      "feature": "popup",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:42:38.530Z",
+      "feature": "popup",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:42:42.177Z",
+      "feature": "popup",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:42:45.321Z",
+      "feature": "popup",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:42:51.510Z",
+      "feature": "popup",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:42:55.876Z",
+      "feature": "popup",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:42:59.977Z",
+      "feature": "popup",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T02:43:04.152Z",
+      "feature": "popup",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:07:56.274Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:09:00.540Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:13:35.128Z",
+      "feature": "focus-guard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:13:55.371Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:13:59.892Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:14:07.429Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:14:13.536Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:14:19.842Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:14:33.840Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:14:40.575Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:14:48.454Z",
+      "feature": "popup",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:14:53.304Z",
+      "feature": "popup",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:28:58.679Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:29:06.476Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:29:10.771Z",
+      "feature": "popup",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:29:29.478Z",
+      "feature": "content",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:29:31.610Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:29:36.393Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:29:48.568Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:29:52.066Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:29:58.275Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:30:02.144Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:30:06.090Z",
+      "feature": "popup",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:31:16.355Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:32:05.175Z",
+      "feature": "newtab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:32:33.144Z",
+      "feature": "popup",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:32:50.682Z",
+      "feature": "content",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T04:33:00.285Z",
+      "feature": "popup",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T05:37:23.413Z",
+      "feature": "dev",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T05:37:32.901Z",
+      "feature": "newtab",
       "phase": "do",
       "action": "updated"
     }

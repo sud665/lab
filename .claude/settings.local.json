@@ -31,7 +31,8 @@
       "Bash(npx create-next-app@latest:*)",
       "Bash(node -e:*)",
       "Bash(npm run lint:*)",
-      "Bash(git status:*)"
+      "Bash(git status:*)",
+      "WebFetch(domain:frontend.horse)"
     ]
   },
   "teammateMode": "tmux"
